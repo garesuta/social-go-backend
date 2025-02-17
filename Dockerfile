@@ -1,5 +1,5 @@
 #The build statge
-FROM golang:1.22 as builder
+FROM golang:latest as builder
 
 WORKDIR /app
 
