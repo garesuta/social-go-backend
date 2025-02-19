@@ -9,12 +9,19 @@ import (
 )
 
 func main() {
-	addr := env.GetString("DB_ADDR", "postgres://admin:adminpassword@localhost/socialnetwork?sslmode=disable")
-	conn, err := db.New(addr, 3, 3, "15m")
+	addr := env.GetString("DB_MIGRATOR_ADDR", "")
+	// conn, err := db.New(addr, 3, 3, "15m")
+	conn, err := db.New(
+		addr,
+		3,
+		3,
+		"15m",
+	)
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer conn.Close()
+	log.Println("database connection pool established")
 	store := store.NewPostgresStorage(conn)
 	db.Seed(store, conn)
 }

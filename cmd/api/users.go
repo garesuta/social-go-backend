@@ -139,9 +139,11 @@ func (app *application) followUserHandler(w http.ResponseWriter, r *http.Request
 			return
 		}
 	}
-	if err := app.jsonResponse(w, http.StatusNoContent, nil); err != nil {
-		app.internalServerError(w, r, err)
-	}
+	// if err := app.jsonResponse(w, http.StatusNoContent, nil); err != nil {
+	// 	app.internalServerError(w, r, err)
+	// }
+	//we dont need a response body so-->
+	w.WriteHeader(http.StatusNoContent)
 }
 
 // UnfollowUser godoc

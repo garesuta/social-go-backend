@@ -88,7 +88,10 @@ func Seed(store store.Storage, db *sql.DB) {
 
 	users := generateUsers(100)
 	//create a transaction
-	tx, _ := db.BeginTx(ctx, nil)
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		log.Fatalf("Failed to begin transaction: %v", err) // Stop execution
+	}
 	for _, user := range users {
 		if err := store.Users.Create(ctx, tx, user); err != nil {
 			_ = tx.Rollback() // rollback if it's get error

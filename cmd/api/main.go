@@ -2,8 +2,6 @@ package main
 
 import (
 	"context"
-	"expvar"
-	"runtime"
 	"time"
 
 	"github.com/backend-production-go-1/internal/auth"
@@ -42,7 +40,7 @@ func main() {
 		apiURL:      env.GetString("EXTERNAL_URL", "localhost:8080"),
 		frontendURL: env.GetString("FRONTEND_URL", "http://localhost:5173"),
 		db: dbConfig{
-			addr:         env.GetString("DB_ADDR", "postgres://admin:adminpassword@localhost/socialnetwork?sslmode=disable"),
+			addr:         env.GetString("DB_MIGRATOR_ADDR", "postgres://admin:adminpassword@localhost/socialnetwork?sslmode=disable"),
 			maxOpenConns: env.GetInt("DB_MAX_OPEN_CONNS", 30),
 			maxIdleConns: env.GetInt("DB_MAX_IDLE_CONNS", 30),
 			maxIdleTime:  env.GetString("DB_MAX_IDLE_TIME", "15m"),
@@ -51,7 +49,7 @@ func main() {
 			addr:    env.GetString("REDIS_ADDR", "localhost:6379"),
 			pw:      env.GetString("REDIS_PW", ""),
 			db:      env.GetInt("REDIS_DB", 0),
-			enabled: env.GetBool("REDIS_ENABLED", true), // if we want to use redis turn to true --> off false
+			enabled: env.GetBool("REDIS_ENABLED", false), // if we want to use redis turn to true --> off false
 		},
 		env: env.GetString("ENV", "development"),
 		mail: mailConfig{
@@ -96,9 +94,20 @@ func main() {
 	if err != nil {
 		logger.Fatal(err)
 	}
-
+	// liq/pq
+	// db, err := sql.Open("postgres", cfg.db.addr)
+	// if err != nil {
+	// 	panic(err)
+	// }
 	defer db.Close()
 	logger.Info("database connection pool established")
+	//pgx
+	// db, err := pgx.Connect(context.Background(), cfg.db.addr)
+	// if err != nil {
+	// 	panic(err)
+	// }
+	// defer db.Close(context.Background())
+	// logger.Info("database connection pool established")
 
 	// Cache
 	//check param
@@ -157,13 +166,13 @@ func main() {
 	}
 
 	// Metrics collected
-	expvar.NewString("version").Set(version)
-	expvar.Publish("database", expvar.Func(func() any {
-		return db.Stats()
-	}))
-	expvar.Publish("goroutines", expvar.Func(func() any {
-		return runtime.NumGoroutine()
-	}))
+	// expvar.NewString("version").Set(version)
+	// expvar.Publish("database", expvar.Func(func() any {
+	// 	return db.Stats()
+	// }))
+	// expvar.Publish("goroutines", expvar.Func(func() any {
+	// 	return runtime.NumGoroutine()
+	// }))
 
 	mux := app.mount()
 
